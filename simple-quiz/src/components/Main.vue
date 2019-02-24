@@ -1,15 +1,15 @@
 <template>
-  <div>
+  <div class="container">
     <div v-if="currentIndex + 1 !== values.length">
       <input type="file" v-if="values.length === 0" @change="loadFile($event)">
       <div v-if="currentIndex !== null">
         <h3 v-if="values.length !== 0">{{currentIndex + 1}}/{{values.length}}</h3>
-        <h4>{{wrongAnswers.length}}</h4>
-        <h4>{{correctAnswers.length}}</h4>
+        <h4>Wrong: {{wrongAnswers.length}}</h4>
+        <h4>Correct: {{correctAnswers.length}}</h4>
         <h1>{{values[currentIndex][0]}}</h1>
         <input type="text" v-model="currentAnswer" @keyup="handleKeyboard($event)">
-        <h2>{{correctAnswer}}</h2>
         <button @click="checkAnswer()">{{correctAnswer ? 'Next' : 'Submit'}}</button>
+        <h2>{{correctAnswer}}</h2>
       </div>
     </div>
     <div v-if="currentIndex + 1 === values.length">
