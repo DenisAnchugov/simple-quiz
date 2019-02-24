@@ -46,7 +46,13 @@
         var reader = new FileReader();
         reader.readAsText(event.target.files[0], "UTF-8");
         reader.onload = (readerEvent) => {
-          this.values = readerEvent.target.result.split("\n").map((line) => line.split(","));
+          this.values = readerEvent.target.result.split("\n").map((line) => {
+            if (line.indexOf(",") !== -1) {
+              return line.split(",");
+            } else {
+              return line.split(";");
+            }
+          });
           if (this.values.length !== 0) {
             this.currentIndex = 0;
           }
