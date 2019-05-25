@@ -1,7 +1,16 @@
 <template>
   <div class="container">
     <div v-if="currentIndex + 1 !== values.length">
-      <input type="file" v-if="values.length === 0" @change="loadFile($event)">
+      <form v-if="values.length === 0">
+        <fieldset>
+          <label for="loadFile">Exercise file</label>
+          <input type="file" id="loadFile"  @change="loadFile($event)">
+          <label for="shuffle"> Shuffle</label>
+          <input type="checkbox" id="shuffle" v-model="shuffle">
+          <label for="invert"> Invert</label>
+          <input type="checkbox" id="invert" v-model="invert">
+        </fieldset>
+      </form>
       <div v-if="currentIndex !== null">
         <h3 v-if="values.length !== 0">{{currentIndex + 1}}/{{values.length}}</h3>
         <h4>Wrong: {{wrongAnswers.length}}</h4>
@@ -38,7 +47,9 @@
         wrongAnswers: [],
         correctAnswers: [],
         currentAnswer: '',
-        correctAnswer: null
+        correctAnswer: null,
+        shuffle: Boolean,
+        invert: Boolean
       }
     },
     methods: {
@@ -47,14 +58,26 @@
         reader.readAsText(event.target.files[0], "UTF-8");
         reader.onload = (readerEvent) => {
           this.values = readerEvent.target.result.split("\n").map((line) => {
+            var questionAndAnswer;
             if (line.indexOf(",") !== -1) {
-              return line.split(",");
+              questionAndAnswer = line.split(",");
             } else {
-              return line.split(";");
+              questionAndAnswer = line.split(";");
+            }
+            if (this.invert) {
+              return questionAndAnswer.reverse();  
+            } else{
+              return questionAndAnswer;
             }
           });
           if (this.values.length !== 0) {
             this.currentIndex = 0;
+          }
+          if (this.shuffle) {
+            for (let i = this.values.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [this.values[i], this.values[j]] = [this.values[j], this.values[i]];
+            }
           }
         }
       },
