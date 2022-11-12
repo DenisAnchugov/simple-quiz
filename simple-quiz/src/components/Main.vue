@@ -3,11 +3,11 @@
     <div v-if="currentIndex + 1 !== values.length">
       <form v-if="values.length === 0">
         <fieldset>
-          <label for="loadFile">Exercise file</label>
+          <label for="loadFile">Select a file</label>
           <input type="file" id="loadFile"  @change="loadFile($event)">
-          <label for="shuffle"> Shuffle</label>
+          <label for="shuffle">Shuffle</label>
           <input type="checkbox" id="shuffle" v-model="shuffle">
-          <label for="invert"> Invert</label>
+          <label for="invert">Invert</label>
           <input type="checkbox" id="invert" v-model="invert">
         </fieldset>
       </form>
@@ -57,22 +57,24 @@
         var reader = new FileReader();
         reader.readAsText(event.target.files[0], "UTF-8");
         reader.onload = (readerEvent) => {
-          this.values = readerEvent.target.result.split("\n").map((line) => {
+          var lines = [];
+          readerEvent.target.result.split("\n").forEach(line => {
             var questionAndAnswer;
             if (line.indexOf(",") !== -1) {
-              questionAndAnswer = line.split(",");
+              var questionAndAnswer = line.split(",");
+            } else if (line.indexOf(";") !== -1) {
+              var questionAndAnswer = line.split(";")
             } else {
-              questionAndAnswer = line.split(";");
+              return;
             }
-            if (this.invert) {
-              return questionAndAnswer.reverse();  
-            } else{
-              return questionAndAnswer;
+            if (questionAndAnswer.length === 2 && questionAndAnswer[0].trim().length !== 0 && questionAndAnswer[1].trim().length !== 0) {
+              lines.push(this.invert ? questionAndAnswer.reverse() : questionAndAnswer);
             }
           });
-          if (this.values.length !== 0) {
-            this.currentIndex = 0;
-          }
+
+          this.values = lines;
+          if (this.values.length !== 0) { this.currentIndex = 0; }
+
           if (this.shuffle) {
             for (let i = this.values.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
